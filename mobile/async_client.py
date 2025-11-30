@@ -24,29 +24,6 @@ class BridgeClient:
         self.on_message_callback = message_callback
         self.on_status_callback = status_callback
 
-    async def connect(self, country="Russia", language="en"):
-        """Подключаемся к WebSocket серверу"""
-        try:
-            self._update_status("Connecting to server...")
-
-            self.websocket = await websockets.connect("ws://localhost:8000/ws")
-            self.connected = True
-
-            # Отправляем данные пользователя
-            user_data = {
-                "country": country,
-                "language": language
-            }
-            await self.websocket.send(json.dumps(user_data))
-            self._update_status("Waiting for partner...")
-
-            # Запускаем прослушивание сообщений
-            await self._listen_messages()
-
-        except Exception as e:
-            self._update_status(f"Connection error: {str(e)}")
-            self.connected = False
-
     async def _listen_messages(self):
         """Прослушиваем сообщения от сервера"""
         try:
