@@ -1,13 +1,14 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from typing import Dict, List, Any
 import json
 import uuid
 import logging
 import sys
 import os
 import asyncio
-import time
+
 
 # Добавляем путь для импортов
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -69,7 +70,6 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
 
     user_id = str(uuid.uuid4())
-    current_user = {}
     logger.info(f"🔵 NEW WEBSOCKET CONNECTION: {user_id}")
 
     try:
@@ -77,7 +77,6 @@ async def websocket_endpoint(websocket: WebSocket):
         data = await websocket.receive_text()
         user_data = json.loads(data)
         user_data["user_id"] = user_id
-        current_user = user_data
 
         logger.info(f"🔵 CLIENT {user_id} FROM {user_data.get('country')} CONNECTED")
 
@@ -326,7 +325,7 @@ async def get_stats():
 @app.get("/debug/state")
 async def debug_state():
     """Подробная отладочная информация"""
-    state = {
+    state: Dict[str, Any] = {
         "active_connections": {},
         "waiting_users": [],
         "issues": []
